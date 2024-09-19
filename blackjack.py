@@ -40,11 +40,19 @@ def add(hand):
 # Comienzo del juego para jugadores
 for player in all_players:
     if player == 'Dealer':
+        out = False
         score = 0
         hand = []
         hand.append(draw())
-        while score < 21:
-            hand.append(draw())
+        while score < 21 and out != True:
+            weight = 1.0
+            if score > 17:
+                weight = 1 - 0.2*(score-17)
+            choice = random.choices(["True","False"],[weight,(1-weight)],k=1) # Elige si seguir robando según el puntuaje, por cada punto por encima de 17 deduce un 20% de probabilidades de robar
+            if choice == ['True']: # Se genera como lista el valor lo comparamos directamente con una lista porque honestamente no se que estoy haciendo :)
+                hand.append(draw())
+            else:
+                out = True
             score = add(hand)
         all_players['Dealer'] = score
     else:
