@@ -76,13 +76,15 @@ for player in all_players:
             print("BLACKJACK!!!!!")
             all_players[player] = score # Graba los puntos en el listado
 
-# Tras que juegen todos los jugadores
-print(f"Los resultados finales son: {all_players}")
-all_players = dict(sorted(all_players.items(), key=lambda item: item[1], reverse=True)) # Ni idea que hace pero es un sort en diccionario por valores
-print(f"Los resultados finales ORDENADOS son: {all_players}")
+# Tras que juegen todos los jugadores sacamos al ganador
+
+# Filtramos a los que se han pasado de 21
 winners = {}
 for player,score in all_players.items():
-    if score < 21:
+    if score <= 21:
         winners[player] = score
-print(winners)
+
+# Saca la clave con el valor más alto, en caso de empate es por posicion de diccionario
+max = max(winners, key=winners.get) 
+print(f"El ganador es {max}")
 
