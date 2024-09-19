@@ -18,7 +18,7 @@ while True:
         pass
 
 # Creamos arrays en base a la cantidad de jugadores y añadimos al dealer
-all_players = {'name':'Dealer', 'score':0}
+all_players = {'Dealer':0}
 name = "foo"
 for i in range(player_count):
     name = input(f"Introduce el nombre del jugador {i+1}: ")
@@ -36,42 +36,53 @@ def add(hand):
         total -= 10
         aces -= 1
     return total
-total_scores = {}
 
 # Comienzo del juego para jugadores
 for player in all_players:
-    score = 0
-    out = False
-    hand = []
-    choice = "foo"
-    hand.append(draw())
-    score = add(hand)
-    print("Tu mano es",hand)
-    while score < 21 and out != True:
-        print(f"Tienes {score} puntos en tu mano")
-        answer = input("Quieres robar otra carta?(s/n): ")
-        if answer == "s":
-           hand.append(draw())
-           score = add(hand)
-           print("Tu mano es",hand)
-        elif answer == "n": 
-            out = True
-        else:
-            print("Por favor escribe (s/n)")
-    score = add(hand)
-    all_players[player] = score
-    if score > 21:
-        print("Te has pasado de 21")
-    print("Turno del siguiente jugador")
+    if player == 'Dealer':
+        score = 0
+        hand = []
+        hand.append(draw())
+        while score < 21:
+            hand.append(draw())
+            score = add(hand)
+        all_players['Dealer'] = score
+    else:
+        score = 0
+        out = False
+        hand = []
+        choice = "foo"
+        hand.append(draw())
+        score = add(hand)
+        print(f"{player}, tu mano es {hand}")
+        while score < 21 and out != True:
+            print(f"{player}, tienes {score} puntos en tu mano")
+            answer = input(f"{player}, quieres robar otra carta?(s/n): ")
+            if answer == "s":
+                hand.append(draw())
+                score = add(hand)
+                print(f"{player}, tu mano es {hand}")
+            elif answer == "n": 
+                out = True
+                all_players[player] = score # Graba los puntos en el listado
+            else:
+                print("Por favor escribe (s/n)")
+        score = add(hand)
+        all_players[player] = score
+        if score > 21:
+            print("Te has pasado de 21")
+            all_players[player] = score # Graba los puntos en el listado
+        if score == 21:
+            print("BLACKJACK!!!!!")
+            all_players[player] = score # Graba los puntos en el listado
 
-# Comienzo del juego para la CPU
-score = 0
-hand = []
-hand.append(draw())
-while score < 21:
-    hand.append(draw())
-    score = add(hand)
-all_players['Dealer'] = score
-
-print(total_scores)
+# Tras que juegen todos los jugadores
+print(f"Los resultados finales son: {all_players}")
+all_players = dict(sorted(all_players.items(), key=lambda item: item[1], reverse=True)) # Ni idea que hace pero es un sort en diccionario por valores
+print(f"Los resultados finales ORDENADOS son: {all_players}")
+winners = {}
+for player,score in all_players.items():
+    if score < 21:
+        winners[player] = score
+print(winners)
 
