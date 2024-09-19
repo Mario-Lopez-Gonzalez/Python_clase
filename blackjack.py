@@ -23,7 +23,7 @@ name = "foo"
 for i in range(player_count):
     name = input(f"Introduce el nombre del jugador {i+1}: ")
     all_players[name] = 0
-print(all_players)
+
 # Función de sumatorio del valor de una mano
 def add(hand):
     total = 0
@@ -48,6 +48,8 @@ for player in all_players:
             score = add(hand)
         all_players['Dealer'] = score
     else:
+        print(f"Turno de {player}")
+        time.sleep(1) # Añade 1s de pausa
         score = 0
         out = False
         hand = []
@@ -59,6 +61,7 @@ for player in all_players:
             print(f"{player}, tienes {score} puntos en tu mano")
             answer = input(f"{player}, quieres robar otra carta?(s/n): ")
             if answer == "s":
+                time.sleep(1) # Añadimos pausa 1s
                 hand.append(draw())
                 score = add(hand)
                 print(f"{player}, tu mano es {hand}")
@@ -71,9 +74,11 @@ for player in all_players:
         all_players[player] = score
         if score > 21:
             print("Te has pasado de 21")
+            time.sleep(2) # Añade 2s de pausa
             all_players[player] = score # Graba los puntos en el listado
         if score == 21:
             print("BLACKJACK!!!!!")
+            time.sleep(2) # Añade 2s de pausa
             all_players[player] = score # Graba los puntos en el listado
 
 # Tras que juegen todos los jugadores sacamos al ganador
@@ -85,6 +90,7 @@ for player,score in all_players.items():
         winners[player] = score
 
 # Saca la clave con el valor más alto, en caso de empate es por posicion de diccionario
-max = max(winners, key=winners.get) 
+max = max(winners, key=winners.get)
+print(f"El resultado final es de {all_players}")
 print(f"El ganador es {max}")
 
