@@ -97,8 +97,20 @@ for player,score in all_players.items():
     if score <= 21:
         winners[player] = score
 
-# Saca la clave con el valor más alto, en caso de empate es por posicion de diccionario
-max = max(winners, key=winners.get)
+# Sacamos el valor máximo del puntuaje y creamos un array con los ganadores para saber si hay empate
+max_value = max(winners.values())
+winner = []
+for player,score in winners.items():
+    if max_value == score:
+        print(f"Added {player} to winners")
+        winner.append(player)
+        print(f"Winners are {winner}")
+
+# Imprimimos los resultados finales y miramos si hay caso de empate
 print(f"El resultado final es de {all_players}")
-print(f"El ganador es {max}")
+if len(winner) > 1:
+    print(f"Empate, los ganadores son {winner}")
+else:
+    print(f"El ganador es {winner}")
+
 
