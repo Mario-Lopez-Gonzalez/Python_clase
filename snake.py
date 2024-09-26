@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+import os
 
 # Velocidad inicial de la serpiente
 snake_speed = 15
@@ -86,10 +87,16 @@ def game_over():
     game_window.blit(game_over_surface, game_over_rect)
     pygame.display.flip()
     
-    # Damos 2s y luego cerramos el programa
-    time.sleep(2)
-    pygame.quit()
-    quit()
+    # Preparamos opciones para continuar jugando
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    os.execl(sys.executable, sys.executable, *sys.argv) # TODO Relanza el script
+                if event.button == 3:           
+                    time.sleep(2)
+                    pygame.quit()
+                    quit()
 
 # Funcion principal
 while True:
