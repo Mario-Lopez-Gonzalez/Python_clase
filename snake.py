@@ -2,6 +2,7 @@ import pygame
 import random
 import time
 import os
+import sys
 
 # Velocidad inicial de la serpiente
 snake_speed = 15
@@ -72,10 +73,10 @@ def show_score(choice, color, font, size):
 def game_over():
   
     # Creamos el objeto fuente
-    my_font = pygame.font.SysFont('times new roman', 50)
+    my_font = pygame.font.SysFont('times new roman', 20)
     
     # Creamos el fondo del texto
-    game_over_surface = my_font.render('GAME OVER: ' + str(score), True, red)
+    game_over_surface = my_font.render('GAME OVER: ' + str(score)+' Continuar?(Click Izquierdo Sí, Click Derecho No)', True, red)
     
     # Creamos el rectangulo del fondo
     game_over_rect = game_over_surface.get_rect()
@@ -92,7 +93,7 @@ def game_over():
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    os.execl(sys.executable, sys.executable, *sys.argv) # TODO Relanza el script
+                    os.execl(sys.executable, sys.executable, *sys.argv)
                 if event.button == 3:           
                     time.sleep(2)
                     pygame.quit()
@@ -150,7 +151,7 @@ while True:
 
     fruit_uneaten += 1 # Sumamos 1 al contador de fruta sin comer
 
-    if not fruit_spawn or fruit_uneaten > 100: # Si avisamos que no hay fruta spawneamos otra
+    if not fruit_spawn or fruit_uneaten > 100: # Si avisamos que no hay fruta o el contador llega a 100 spawneamos otra
         fruit_position.append([random.randrange(1, (window_x//10)) * 10, 
                           random.randrange(1, (window_y//10)) * 10])
         fruit_uneaten = 0
@@ -159,13 +160,17 @@ while True:
     game_window.fill(black) # Llenamos el fondo de la pantalla de negro
     
     for pos in snake_body: # Por cada segmento de la serpiente
-        pygame.draw.rect(game_window, green, pygame.Rect(
-          pos[0], pos[1], 10, 10)) # Dibujamos un rectangulo en la ventada de juego, de color verde,
+        if score < 100:
+            pygame.draw.rect(game_window, green, pygame.Rect(
+              pos[0], pos[1], 10, 10)) # Dibujamos un rectangulo en la ventada de juego, de color verde,
                                    # en la posición x e y y de 10x10 pixeles
-
-    for pos in fruit_position:    
-        pygame.draw.rect(game_window, white, pygame.Rect( # Dibujamos la fruta con la misma logica
-        pos[0], pos[1], 10, 10))
+        else: # Si tenemos 100 puntos o mas vuelve a la serpiente multicolor
+            pygame.draw.rect(game_window, pygame.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),pygame.Rect(
+              pos[0], pos[1], 10, 10))
+    
+        for pos in fruit_position:    
+            pygame.draw.rect(game_window, white, pygame.Rect( # Dibujamos la fruta con la misma logica
+            pos[0], pos[1], 10, 10))
 
     # Condiciones del game over
     if snake_position[0] < 0 or snake_position[0] > window_x-10: # Comprobamos si estamos tocando la pantalla en los ejes x e y
