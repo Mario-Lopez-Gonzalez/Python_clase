@@ -2,8 +2,23 @@
 import pandas as pd
 import numpy as np
 
-# Cargamos los datos
-data = [15, 20, 15, 18, 22, 13, 13, 16, 15, 19, 18, 15, 16, 20, 16, 15, 18, 16, 14, 13]
+# Preguntamos al usuario formato de datos
+choice = "foo"
+while choice not in ["1", "2"]:
+    print(choice)
+    choice = input("Elige 1 para meter los datos o 2 para meter la xi y ni de los datos: ")
+
+if choice == "1": # Solo datos
+    raw = input("Introduce los datos separados por comas: ")
+    data = [int(x) for x in raw.split(',')]
+elif choice == "2": # xi y ni
+    raw_xi = input("Introduce xi separados por comas: ")
+    xi = [int(x) for x in raw_xi.split(',')]
+    x_i = np.array(xi)
+    raw_ni = input("Introduce ni separados por comas: ")
+    ni = [int(x) for x in raw_ni.split(',')]
+    n_i = np.array(ni)
+    data = np.repeat(x_i,n_i) # Creamos el array de datos a partir de xi y ni
 
 # Creamos un DataFrame para Numpy
 df = pd.DataFrame(data, columns=['Values'])
@@ -48,7 +63,13 @@ mode = values[max_count_index]
 Q1 = np.percentile(data, 25)
 Q2 = np.percentile(data, 50)
 Q3 = np.percentile(data, 75)
+RIQ = Q3-Q1
 median = Q2
+
+# Calculamos los límites inferior y superior para sacar los outliers
+inf_lim = Q1 - 1.5 * RIQ
+sup_lim = Q3 + 1.5 * RIQ
+outliers = [x for x in data if x < inf_lim or x > sup_lim]
 
 # Imprimimos la tabla de frecuencias
 print("Tabla de frecuencias:")
@@ -58,9 +79,16 @@ print(result_df)
 print("\nEstadísticas:")
 print(f"Moda: {mode}")
 print(f"Mediana: {median}")
-print(f"Media: {average}")
+print(f"Media: {average:.2f}")
 print(f"Varianza: {variance:.2f}")
 print(f"Deviación estándar: {std_dev:.2f}")
 print(f"Q1 (25%): {Q1}")
 print(f"Q2 (50%): {Q2}")
 print(f"Q3 (75%): {Q3}")
+print(f"Rango intercuartílico: {RIQ}")
+print(f"Límite inferior: {inf_lim}")
+print(f"Límite superior: {sup_lim}")
+if len(outliers) == 0:
+    print("No hay outliers")
+else:
+    print(f"Los outliers son: {outliers}")
