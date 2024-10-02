@@ -1,0 +1,3 @@
+Ups! Todo lo anterior ha sido borrado!!!
+Hay que ir con cuidado cuando queremos editar un archivo txt...
+Hay que prestar mucha atención al método con el que accedemos al fichero!
