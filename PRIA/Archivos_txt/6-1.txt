@@ -1,0 +1,4 @@
+name: Test
+surname: Tester
+age: 98
+color: Black
