@@ -25,6 +25,16 @@ class Vector2D():
     def substract(vec1,vec2):
         return Vector2D((vec1.x-vec2.x),(vec1.y-vec2.y))
 
+    @staticmethod
+    def dot_product(vec1,vec2):
+        return vec1.x * vec2.x + vec1.y * vec2.y
+    
+    @staticmethod
+    def distance(vec1,vec2):
+        return math.sqrt((vec1.x - vec2.x) ** 2 + (vec1.y - vec2.y) ** 2)
+    
+    def extend_to_3D(self, z=0):
+        return Vector3D(self.x,self.y,z)
 class Vector3D(Vector2D):
     z = 0
 
@@ -57,3 +67,15 @@ class Vector3D(Vector2D):
     def distance(vec1,vec2):
         temp = Vector3D.substract(vec1,vec2)
         return math.sqrt(temp.x**2 + temp.y**2 + temp.z**2)
+    
+    def zero():
+        return Vector3D(0,0,0)
+    
+    def horizontal():
+        return Vector3D(1,0,0)
+    
+    def vectical():
+        return Vector3D(0,1,0)
+    
+    def forward():
+        return Vector3D(0,0,1)
