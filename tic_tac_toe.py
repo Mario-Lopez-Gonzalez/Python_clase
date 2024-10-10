@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 # Tamaño de la ventana emergente
 window_x = 600
@@ -13,6 +14,7 @@ black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
 red = pygame.Color(255, 0, 0)
 blue = pygame.Color(0, 0, 255)
+green = pygame.Color(0, 255, 0)
 
 # Creamos tablero
 board = [[0,0,0]
@@ -90,6 +92,21 @@ def check_win():
     if board[0][2] == board[1][1] == board[2][0] and board[0][2] != 0:
         return ["diag",board[0][2],[(0,2),(1,1),(2,0)]]
     return None
+
+def end(cond,winner,pos_arr): # recibe condicion de victoria, ganador y un array con las celdas a dibujar
+    # Calculamos el comienzo y fin de la linea ganadora
+    start_pos = (pos_arr[0][0] * 200 + 200 // 2, pos_arr[0][1] * 200 + 200 // 2) # pos_arr es lista de tuplas por tanto pos_arr[0] == primera tupla y pos_arr[0][0] es x de la primera tupla
+    end_pos = (pos_arr[2][0] * 200 + 200 // 2, pos_arr[2][1] * 200 + 200 // 2)  # (x, y)
+    for i in range(30): # Creamos un refresco de 30 veces con colores aleatorios para efector arcoiris
+        pygame.draw.line(game_window, pygame.Color(random.randint(0,255), random.randint(0,255), random.randint(0,255)), start_pos, end_pos, 10)
+        pygame.display.flip()
+        time.sleep(0.1)
+    pygame.quit()
+    quit()
+def end_draw():
+    text_surf = font.render("EMPATE", True, white)
+    text_rect = text_surf.get_rect()
+    text_rect.center = (300,300)
 # Funcion principal
 while True:
 
@@ -126,16 +143,12 @@ while True:
                 y = ((y_n))*200 + 200/2
                 draw("x",x,y)
                 if sum(row.count(0) for row in board) == 0 or check_win(): #No hay huecos
-                    print(check_win())
-                    pygame.quit()
-                    quit()
+                    if check_win == None:
+                        end_draw()
+                    end(*check_win())
                 cpu() # Turno de la CPU
                 if sum(row.count(0) for row in board) == 0 or check_win(): #No hay huecos
-                    print(check_win())
-                    pygame.quit()
-                    quit()
-        if event.type == pygame.KEYDOWN: # Escape del juego up arrow
-            if event.key == pygame.K_UP: 
-                pygame.quit()
-                quit()
+                    if check_win == None:
+                        end_draw()
+                    end(*check_win())
 
