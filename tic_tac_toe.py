@@ -68,6 +68,16 @@ def cpu():
                 else:
                     board[i][j] = 0 # Vaciamos
 
+    for i in range(len(board)): # Simulamos si puede ganar el jugador
+        for j in range(len(board[i])):
+            if board[i][j] == 0:
+                board[i][j] = "x" # Simulamos un movimiento
+                if check_win():
+                    board[i][j] = "o" # Borramos la X simulada por nuestra O
+                    draw("o",i * 200 + 200/2 ,j * 200 + 200/2) # Le robamos la jugada al humano
+                    return None # Es literalmente un break ups
+                else:
+                    board[i][j] = 0 # Vaciamos
     # Esto solo corre si hay que jugar de forma aleatoria
     x = random.randint(0,600)
     y = random.randint(0,600)
