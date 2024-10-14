@@ -6,5 +6,5 @@ colors = random.choices(list(mcolors.CSS4_COLORS.values()),k = 6) # k = number o
 options = ["1", "2", "3", "4", "5", "6"]
 count = [5, 15, 20, 10, 8, 2]
 plt.pie(count, colors = colors, labels = options, autopct = "%0.2f%%")
-plt.title("")
+plt.title("SGBD 2_3 1-b")
 plt.show()
