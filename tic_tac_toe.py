@@ -58,38 +58,42 @@ def draw(symbol,x,y):
         game_window.blit(text_surf, text_rect)
 
 def cpu():
-    for i in range(len(board)): # Simulamos si podemos ganar
+     # Simulamos si podemos ganar recorriendo el array uno a uno y poniendo "o" en las vacías
+    for i in range(len(board)):
         for j in range(len(board[i])):
-            if board[i][j] == 0:
+            if board[i][j] == 0: # Si la casilla esta vacía...
                 board[i][j] = "o" # Simulamos un movimiento
-                if check_win():
-                    draw("o",i * 200 + 200/2 ,j * 200 + 200/2)
-                    return None # Es literalmente un break ups
+                if check_win(): # Si ganamos con ese movimiento lo dejamos y dibujamos
+                    draw("o",i * 200 + 200/2 ,j * 200 + 200/2) # Forzamos dibujo al centro del grid
+                    return None # Es literalmente un break
                 else:
-                    board[i][j] = 0 # Vaciamos
+                    board[i][j] = 0 # Si no ganamos deshacemos y dejamos como estaba
 
-    for i in range(len(board)): # Simulamos si puede ganar el jugador
+    # Simulamos si puede ganar el jugador con el mismo método
+    for i in range(len(board)):
         for j in range(len(board[i])):
             if board[i][j] == 0:
-                board[i][j] = "x" # Simulamos un movimiento
-                if check_win():
-                    board[i][j] = "o" # Borramos la X simulada por nuestra O
-                    draw("o",i * 200 + 200/2 ,j * 200 + 200/2) # Le robamos la jugada al humano
-                    return None # Es literalmente un break ups
+                board[i][j] = "x" # Simulamos un movimiento pero con "x"
+                if check_win(): # Miramos si ganaría el humano
+                    board[i][j] = "o" # Borramos la X simulada por nuestra O o sino fallaría la lógica de todo
+                    draw("o",i * 200 + 200/2 ,j * 200 + 200/2)
+                    return None # Es literalmente un break
                 else:
-                    board[i][j] = 0 # Vaciamos
-    # Esto solo corre si hay que jugar de forma aleatoria
+                    board[i][j] = 0 # Si no ganamos deshacemos y dejamos como estaba
+
+    # Esto solo corre si hay que jugar de forma aleatoria porque no hay movimientos ganadores
+    # Escogemos coordenadas aleatorias
     x = random.randint(0,600)
     y = random.randint(0,600)
     # Normalizamos las coordenadas al centro del cuadrante más cercano
     x_n = x // 200
     y_n = y // 200
-    while board[x_n][y_n] != 0: # Si esta cogido vuelve a sacar número
+    while board[x_n][y_n] != 0: # Si está cogido vuelve a sacar número y normalizamos
         x = random.randint(0,600)
         y = random.randint(0,600)
         x_n = x // 200
         y_n = y // 200
-    board[x_n][y_n] = "o"
+    board[x_n][y_n] = "o" # Colocamos la ficha y calculamos coordenadas para dibujar
     x = ((x_n))*200 + 200/2
     y = ((y_n))*200 + 200/2
     draw("o",x,y)
@@ -112,7 +116,7 @@ def check_win():
 
     # Verificar diagonal secundaria
     if board[0][2] == board[1][1] == board[2][0] and board[0][2] != 0:
-        return ["diag",board[0][2],[(0,2),(1,1),(2,0)]]
+        return ["diag",board[0][2],[(0,2),(1,1),(2,0)]] # Devuelve condicion de victoria, simbolo ganador y que diagonal
     return None
 
 def end(cond,winner,pos_arr): # recibe condicion de victoria, ganador y un array con las celdas a dibujar
@@ -125,15 +129,18 @@ def end(cond,winner,pos_arr): # recibe condicion de victoria, ganador y un array
         time.sleep(0.1)
     pygame.quit()
     quit()
+
 def end_draw():
+    # Creamos texto con font2 para que quepa en pantalla (es de 200 en vez de 250 pixeles)
     text_surf = font2.render("EMPATE", True, white)
     text_rect = text_surf.get_rect()
     text_rect.center = (300,300)
     game_window.blit(text_surf, text_rect)
-    pygame.display.flip()
+    pygame.display.flip() # Creo que no hace nada
     time.sleep(2)
     pygame.quit()
     quit()
+
 # Funcion principal
 while True:
 
@@ -148,7 +155,8 @@ while True:
     # Actualizar la pantalla
     pygame.display.flip()
 
-    if random.choice([1,2]) == 2 and not cpu_start: # Comienza CPU
+    # Determinamos si comienza la CPU
+    if random.choice([1,2]) == 2 and not cpu_start: 
         cpu()
         cpu_start = True
     else: # No comienza cpu pero se ha intentado (se evita que rollee cada frame para ganar)
@@ -165,16 +173,21 @@ while True:
             if board[x_n][y_n] == 0: # Click en celda libre
                 # Actualizamos el estado del tablero
                 board[x_n][y_n] = "x"
-                # Normalizamos las coordenadas al centro del cuadrante más cercano
+                # Normalizamos las coordenadas al centro del cuadrante más cercano y dibujamos
                 x = ((x_n))*200 + 200/2
                 y = ((y_n))*200 + 200/2
                 draw("x",x,y)
+                #Miramos si el humano gana o si no hay mas celdas
                 if check_win():
                     end(*check_win())
-                elif sum(row.count(0) for row in board) == 0:
+                elif sum(row.count(0) for row in board) == 0: # No hay celdas
                     end_draw()
-                cpu() # Turno de la CPU
+                # Turno de la CPU
+                cpu()
+                # Miramos si la CPU ha ganado o si no hay más espacios libres, sino se repite el bucle principal y le toca al humano
                 if check_win():
                     end(*check_win())
-                elif sum(row.count(0) for row in board) == 0:
-                    end_draw()
+                elif sum(row.count(0) for row in board) == 0: # No hay celdas
+                    end_draw() 
+
+# TODO meter música resultados WIN/LOSE/DRAW (?)
