@@ -33,6 +33,7 @@ game_window = pygame.display.set_mode((window_x, window_y)) #
 
 # Elegimos fuente para el texto
 font = pygame.font.Font(None, 250)
+font2 = pygame.font.Font(None,200)
 
 def draw(symbol,x,y):
     if symbol == "x":
@@ -104,9 +105,14 @@ def end(cond,winner,pos_arr): # recibe condicion de victoria, ganador y un array
     pygame.quit()
     quit()
 def end_draw():
-    text_surf = font.render("EMPATE", True, white)
+    text_surf = font2.render("EMPATE", True, white)
     text_rect = text_surf.get_rect()
     text_rect.center = (300,300)
+    game_window.blit(text_surf, text_rect)
+    pygame.display.flip()
+    time.sleep(2)
+    pygame.quit()
+    quit()
 # Funcion principal
 while True:
 
@@ -142,13 +148,12 @@ while True:
                 x = ((x_n))*200 + 200/2
                 y = ((y_n))*200 + 200/2
                 draw("x",x,y)
-                if sum(row.count(0) for row in board) == 0 or check_win(): #No hay huecos
-                    if check_win == None:
-                        end_draw()
+                if check_win():
                     end(*check_win())
+                elif sum(row.count(0) for row in board) == 0:
+                    end_draw()
                 cpu() # Turno de la CPU
-                if sum(row.count(0) for row in board) == 0 or check_win(): #No hay huecos
-                    if check_win == None:
-                        end_draw()
+                if check_win():
                     end(*check_win())
-
+                elif sum(row.count(0) for row in board) == 0:
+                    end_draw()
