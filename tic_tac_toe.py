@@ -58,6 +58,17 @@ def draw(symbol,x,y):
         game_window.blit(text_surf, text_rect)
 
 def cpu():
+    for i in range(len(board)): # Simulamos si podemos ganar
+        for j in range(len(board[i])):
+            if board[i][j] == 0:
+                board[i][j] = "o" # Simulamos un movimiento
+                if check_win():
+                    draw("o",i * 200 + 200/2 ,j * 200 + 200/2)
+                    return None # Es literalmente un break ups
+                else:
+                    board[i][j] = 0 # Vaciamos
+
+    # Esto solo corre si hay que jugar de forma aleatoria
     x = random.randint(0,600)
     y = random.randint(0,600)
     # Normalizamos las coordenadas al centro del cuadrante más cercano
