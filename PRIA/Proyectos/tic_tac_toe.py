@@ -83,14 +83,14 @@ def cpu():
 
     # Esto solo corre si hay que jugar de forma aleatoria porque no hay movimientos ganadores
     # Escogemos coordenadas aleatorias
-    x = random.randint(0,600)
-    y = random.randint(0,600)
+    x = random.randint(0,599) # Si sale 600, 600//200 = 3 y es out of range
+    y = random.randint(0,599)
     # Normalizamos las coordenadas al centro del cuadrante más cercano
     x_n = x // 200
     y_n = y // 200
     while board[x_n][y_n] != 0: # Si está cogido vuelve a sacar número y normalizamos
-        x = random.randint(0,600)
-        y = random.randint(0,600)
+        x = random.randint(0,599)
+        y = random.randint(0,599)
         x_n = x // 200
         y_n = y // 200
     board[x_n][y_n] = "o" # Colocamos la ficha y calculamos coordenadas para dibujar
@@ -182,6 +182,9 @@ while True:
                     end(*check_win())
                 elif sum(row.count(0) for row in board) == 0: # No hay celdas
                     end_draw()
+                # Esperamos un poco para fingir que la CPU piensa (hay que refrescar pantalla aqui o parece que tenemos lag)
+                pygame.display.flip()
+                time.sleep(0.75)
                 # Turno de la CPU
                 cpu()
                 # Miramos si la CPU ha ganado o si no hay más espacios libres, sino se repite el bucle principal y le toca al humano
