@@ -146,7 +146,9 @@ class Labyrinth:
 # Bloque principal
 
 # Invocamos laberinto
-laberinto = Labyrinth()
+x = int(input("Introduce el alto del laberinto (impar):"))
+y = int(input("Introduce el ancho del laberinto (impar):"))
+laberinto = Labyrinth(x,y)
 
 # Definimos el tamaño de la ventana de pygame según el tamaño del laberinto
 window_x = 30 * laberinto.filas
