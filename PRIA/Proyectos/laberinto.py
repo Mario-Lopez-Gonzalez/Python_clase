@@ -196,6 +196,9 @@ class Labyrinth:
         return -1
 
     def bfs(self):
+        #Dibujar el laberinto
+        self.draw()
+        pygame.display.update()
         # Movimientos posibles: derecha, abajo, izquierda, arriba
         movimientos = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         # Cola para la ruta y conjunto para las celdas visitadas con la entrada como primer nodo
@@ -216,7 +219,7 @@ class Labyrinth:
                 camino = []
                 while (x, y) is not None:
                     camino.append((x, y))
-                    x, y = padre[(x, y)]
+                    x, y = padre[(x, y)] # TODO bug al llegar aquí
                 camino.reverse()  # Invertir para obtener la ruta desde el inicio hasta la salida
                 self.draw_bfs_path(camino)
                 return len(camino)
