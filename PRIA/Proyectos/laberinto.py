@@ -1,6 +1,7 @@
 import random
 import pygame
 import time
+from collections import deque
 
 class Sign:
     def __init__(self,window_x,window_y):
@@ -32,6 +33,8 @@ class Sign:
 class Labyrinth:
     def __init__(self, filas=21, columnas=21):
         # Comprobamos que los parámetros sean impares para poder dibujar paredes por el borde, sino sumamos 1
+        if filas == 1 or columnas == 1:
+            raise Exception("Por favor no introduzcas un 1, que te esperas que se genere?")
         if filas % 2 == 0:
             filas += 1
         if columnas % 2 == 0:
@@ -117,6 +120,19 @@ class Labyrinth:
             i*30, j*30, 30, 30))
         pygame.display.update()
 
+    def draw_steps_bfs(self,cola):
+        # Limpiamos pantalla solo una vez antes de llamar a la funcion
+        for i, j in cola:
+            pygame.draw.rect(window, blue, pygame.Rect(
+            i*30, j*30, 30, 30))
+        pygame.display.update()
+
+    def draw_bfs_path(self,cola):
+        for i, j in cola:
+            pygame.draw.rect(window, purple, pygame.Rect(
+            i*30, j*30, 30, 30))
+        pygame.display.update()
+
     def __str__(self): # Fallback por si falla pygame, para testing con print, pinta rotado 90º
         output = ""
         for fila in self.lab:
@@ -131,6 +147,10 @@ class Labyrinth:
         return output
 
     def dfs(self):
+        # Limpiamos la pantalla una vez dado a que bfs no retrocede
+        window.fill(black)
+        laberinto.draw()
+        pygame.display.update()
         # Movimientos posibles: derecha, abajo, izquierda, arriba
         movimientos = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         # Pila para la ruta y conjunto para las celdas visitadas con la entrada como primer nodo
@@ -171,16 +191,53 @@ class Labyrinth:
             if not encontrado:
                 pila.pop()
         
-        # Si hemos agotado la pila, no hay solución
-        print("No se encontró una ruta")
-        return False
-    
+        # Si hemos agotado la pila, no hay solución, esto NO DEBERIA DE OCURRIR
+        print("No se encontró una ruta dfs")
+        return -1
 
+    def bfs(self):
+        # Movimientos posibles: derecha, abajo, izquierda, arriba
+        movimientos = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        # Cola para la ruta y conjunto para las celdas visitadas con la entrada como primer nodo
+        cola = deque([self.entrada])
+        visitados = set([self.entrada])
+        
+        # Diccionario para rastrear la ruta
+        padre = {self.entrada: None}
+
+        # Algoritmo BFS
+        while cola:
+            # Usamos los valores de la parte frontal de la cola
+            x, y = cola.popleft()
+            
+            # Verificar si hemos llegado a la meta
+            if (x, y) == self.salida:
+                # Reconstruir la ruta desde el final hasta el comienzo
+                camino = []
+                while (x, y) is not None:
+                    camino.append((x, y))
+                    x, y = padre[(x, y)]
+                camino.reverse()  # Invertir para obtener la ruta desde el inicio hasta la salida
+                self.draw_bfs_path(camino)
+                return len(camino)
+            
+            # Intentar moverse en las cuatro direcciones
+            for dx, dy in movimientos:
+                nuevo_x, nuevo_y = x + dx, y + dy
+                if self.es_camino(nuevo_x, nuevo_y) and (nuevo_x, nuevo_y) not in visitados:
+                    cola.append((nuevo_x, nuevo_y)) # Añadimos a la cola
+                    visitados.add((nuevo_x, nuevo_y)) # Añadimos al conjunto de visitados
+                    padre[(nuevo_x, nuevo_y)] = (x, y) # Registrar de dónde vino
+                    self.draw_steps_bfs(cola)  # Llamamos a dibujar la pantalla
+                    time.sleep(0.05)
+        # Esto no debería de ocurrir
+        print("No se encontró una ruta")
+        return None
 # Bloque principal
 
 # Invocamos laberinto
-x = int(input("Introduce el alto del laberinto (impar):"))
-y = int(input("Introduce el ancho del laberinto (impar):"))
+x = int(input("Introduce el alto del laberinto:"))
+y = int(input("Introduce el ancho del laberinto:"))
 laberinto = Labyrinth(x,y)
 
 # Definimos el tamaño de la ventana de pygame según el tamaño del laberinto
@@ -196,6 +253,7 @@ white = pygame.Color(255, 255, 255)
 red = pygame.Color(255, 0, 0)
 green = pygame.Color(0, 255, 0)
 blue = pygame.Color(0, 0, 255)
+purple = (128, 0, 128)
 
 # Iniciamos pygame
 pygame.init()
@@ -235,6 +293,24 @@ pygame.display.flip() # Si el flip se hace en el método da un poco de epilepsia
 time.sleep(2)
 cartel.draw("Método Breadth-First Search (BFS)",white)
 time.sleep(1.5)
+# Comenzamos a contar el tiempo de resolución
+inicio = time.perf_counter()
+# Resolvemos y guardamos los pasos
+steps_bfs = laberinto.bfs()
+# Dejamos de contar el tiempo de resolución
+fin = time.perf_counter()
+# Calculamos la diferencia de tiempos y formateamos para enseñarlo
+tiempo = fin - inicio
+tiempo_bfs = "{:.4f}".format(tiempo)
+text = "Tiempo total: {}s".format(tiempo_bfs)
+time.sleep(1)
+cartel.draw(text,white)
+time.sleep(2)
+text = "Total de pasos: {} pasos".format(steps_bfs)
+cartel.draw(text,white)
+time.sleep(2)
+window.fill(black)
+laberinto.draw()
 # Refrescamos la pantalla
 pygame.display.update()
 
