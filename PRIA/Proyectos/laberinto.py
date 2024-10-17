@@ -31,9 +31,11 @@ class Sign:
         
 class Labyrinth:
     def __init__(self, filas=21, columnas=21):
-        # Comprobamos que los parámetros sean impares para poder dibujar paredes por el borde
-        if filas % 2 == 0 or columnas % 2 == 0:
-            raise ValueError("Las dimensiones deben ser impares para permitir paredes.")
+        # Comprobamos que los parámetros sean impares para poder dibujar paredes por el borde, sino sumamos 1
+        if filas % 2 == 0:
+            filas += 1
+        if columnas % 2 == 0:
+            columnas += 1
         
         # Atributos
         # Tamaños
@@ -209,29 +211,29 @@ laberinto.draw()
 pygame.display.update()
 time.sleep(1)
 # Enseñamos texto
-cartel.draw("MÉTODO Depth-First Search (DFS)",white)
+cartel.draw("Método Depth-First Search (DFS)",white)
 time.sleep(1.5)
 # Comenzamos a contar el tiempo de resolución
 inicio = time.perf_counter()
 # Resolvemos y guardamos los pasos
-steps = laberinto.dfs()
+steps_dfs = laberinto.dfs()
 # Dejamos de contar el tiempo de resolución
 fin = time.perf_counter()
 # Calculamos la diferencia de tiempos y formateamos para enseñarlo
 tiempo = fin - inicio
-tiempo = "{:.4f}".format(tiempo)
-text = "Tiempo total: {}s".format(tiempo)
+tiempo_dfs = "{:.4f}".format(tiempo)
+text = "Tiempo total: {}s".format(tiempo_dfs)
 time.sleep(1)
 cartel.draw(text,white)
 time.sleep(2)
-text = "Total de pasos: {} pasos".format(steps)
+text = "Total de pasos: {} pasos".format(steps_dfs)
 cartel.draw(text,white)
 time.sleep(2)
 window.fill(black)
-print(laberinto)
-laberinto.draw() # No me vuelve a dibujar el laberinto
-time.sleep(5)
-cartel.draw("MÉTODO Breadth-First Search (BFS)",white)
+laberinto.draw()
+pygame.display.flip() # Si el flip se hace en el método da un poco de epilepsia
+time.sleep(2)
+cartel.draw("Método Breadth-First Search (BFS)",white)
 time.sleep(1.5)
 # Refrescamos la pantalla
 pygame.display.update()
