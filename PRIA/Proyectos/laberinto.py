@@ -305,6 +305,64 @@ class Labyrinth:
         camino.reverse()  # Invertir el camino para que esté desde el inicio hasta el final
         self.draw_bfs_path(camino) # Debería de funcionar con este
         return len(camino)
+
+    def dijkstra(self):
+        rows, cols = len(self.lab), len(self.lab[0])
+        
+        # Inicializar distancias
+        distances = [[float('inf')] * cols for _ in range(rows)]
+        distances[self.entrada[0]][self.entrada[1]] = 0  # La distancia de inicio es 0
+
+        # Predecesores para rastrear la ruta
+        predecessors = [[None for _ in range(cols)] for _ in range(rows)]
+
+        # Conjunto de nodos no visitados
+        visited = set()
+        # Lista de nodos a procesar
+        nodes_to_process = [(0, self.entrada)]  # (distancia, (fila, columna))
+
+        # Movimientos posibles (arriba, abajo, izquierda, derecha)
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        step = 0
+        while nodes_to_process:
+            # Encontrar el nodo no visitado con la distancia más corta
+            current_distance, (x, y) = min((distances[i][j], (i, j)) 
+                                            for i in range(rows) 
+                                            for j in range(cols) 
+                                            if (i, j) not in visited)
+
+            # Marcar el nodo actual como visitado
+            visited.add((x, y))
+            self.draw_steps_bfs(visited)  # Dibujar la pantalla
+            step += 1
+            time.sleep(0.05)
+
+            # Si alcanzamos el destino, podemos devolver la distancia
+            if (x, y) == self.salida:
+                path = []
+                pos = (x,y)
+                while pos is not None:
+                    path.append(pos)
+                    pos = predecessors[pos[0]][pos[1]]
+                path.reverse()  # Invertir para tener la ruta desde el inicio al final
+                self.draw_bfs_path(path)  # Invocar a la función con la ruta encontrada
+                return step
+
+            # Revisar las celdas adyacentes
+            for dx, dy in directions:
+                nx, ny = x + dx, y + dy
+                
+                # Verificar si la celda adyacente está dentro de los límites
+                if 0 <= nx < rows and 0 <= ny < cols and (nx, ny) not in visited:
+                    distance = current_distance + self.lab[nx][ny]  # Sumar el costo de la celda
+
+                    # Solo se actualiza si encontramos una distancia menor
+                    if distance < distances[nx][ny]:
+                        distances[nx][ny] = distance
+                        predecessors[nx][ny] = (x, y)
+                        nodes_to_process.append((distance, (nx, ny)))
+
+        return float('inf')  # Si no hay camino
 # Bloque principal
 
 # Invocamos laberinto
@@ -336,12 +394,8 @@ window = pygame.display.set_mode((window_x, window_y))
 
 # Llenamos el fondo de la pantalla de negro
 window.fill(black)
-# Enseñamos el laberinto
-laberinto.draw()
-pygame.display.update()
-time.sleep(1)
 cartel.draw("Pulsa R para regenerar el laberinto e INTRO para empezar la demo",white)
-time.sleep(3)
+time.sleep(2)
 laberinto.draw()
 pygame.display.update()
 # Regeneramos laberinto si necesario
@@ -377,9 +431,6 @@ text = "Total de pasos: {} pasos".format(steps_dfs)
 cartel.draw(text,white)
 time.sleep(2)
 window.fill(black)
-laberinto.draw()
-pygame.display.flip() # Si el flip se hace en el método da un poco de epilepsia
-time.sleep(2)
 
 # Bloque de BFS
 cartel.draw("Método Breadth-First Search (BFS)",white)
@@ -401,9 +452,30 @@ text = "Total de pasos: {} pasos".format(steps_bfs)
 cartel.draw(text,white)
 time.sleep(2)
 window.fill(black)
+
+# Bloque de dijkstra
+# Enseñamos texto
+cartel.draw("Método dijkstra",white)
+time.sleep(1.5)
 laberinto.draw()
-pygame.display.flip()
+pygame.display.update()
+# Comenzamos a contar el tiempo de resolución
+inicio = time.perf_counter()
+# Resolvemos y guardamos los pasos
+steps_dijkstra = laberinto.dijkstra()
+# Dejamos de contar el tiempo de resolución
+fin = time.perf_counter()
+# Calculamos la diferencia de tiempos y formateamos para enseñarlo
+tiempo = fin - inicio
+tiempo_dijkstra = "{:.4f}".format(tiempo)
+text = "Tiempo total: {}s".format(tiempo_dijkstra)
+time.sleep(1)
+cartel.draw(text,white)
 time.sleep(2)
+text = "Total de pasos: {} pasos".format(steps_dijkstra)
+cartel.draw(text,white)
+time.sleep(2)
+window.fill(black)
 
 # Bloque de A*
 cartel.draw("Método A*",white)
@@ -427,10 +499,10 @@ time.sleep(2)
 
 # Comparativa
 window.fill(black)
-text = "DFS: {}s BFS: {}s A*: {}s".format(tiempo_dfs,tiempo_bfs,tiempo_a)
+text = "DFS: {}s BFS: {}s dijkstra:{}s A*: {}s".format(tiempo_dfs,tiempo_bfs,tiempo_dijkstra,tiempo_a)
 cartel.draw(text,white)
 time.sleep(2)
-text = "DFS: {} pasos BFS: {} pasos A*: {} pasos".format(steps_dfs,steps_bfs,steps_a)
+text = "DFS: {} pasos BFS: {} pasos dijkstra: {} pasos A*: {} pasos".format(steps_dfs,steps_bfs,steps_dijkstra,steps_a)
 cartel.draw(text,white)
 # Refrescamos la pantalla
 pygame.display.update()
