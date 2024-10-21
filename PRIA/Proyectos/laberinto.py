@@ -196,6 +196,7 @@ class Labyrinth:
         return -1
 
     def bfs(self):
+        steps = 0
         #Dibujar el laberinto
         self.draw()
         pygame.display.update()
@@ -222,7 +223,7 @@ class Labyrinth:
                     camino.append(pos)
                     pos = padre[pos]
                 self.draw_bfs_path(camino)
-                return len(camino)
+                return steps
             
             # Intentar moverse en las cuatro direcciones
             for dx, dy in movimientos:
@@ -232,12 +233,14 @@ class Labyrinth:
                     visitados.add((nuevo_x, nuevo_y)) # Añadimos al conjunto de visitados
                     padre[(nuevo_x, nuevo_y)] = (x, y) # Registrar de dónde vino
                     self.draw_steps_bfs(cola)  # Llamamos a dibujar la pantalla
+                    steps += 1
                     time.sleep(0.05)
         # Esto no debería de ocurrir
         print("No se encontró una ruta")
         return None
     
     def a_star(self):
+        steps= 0
         window.fill(black)
         laberinto.draw()
         pygame.display.update()
@@ -262,7 +265,7 @@ class Labyrinth:
             # Verificar si hemos llegado a la meta
             if nodo_actual == self.salida:
                 length = self.draw_a_path(padres, nodo_actual)
-                return length
+                return steps
 
             # Mover el nodo actual de la lista abierta a la lista cerrada
             abierta.remove(nodo_actual)
@@ -286,6 +289,7 @@ class Labyrinth:
                     g_cost[nuevo_nodo] = g_temp
                     f_cost[nuevo_nodo] = g_temp + self.heuristica(nuevo_nodo)
                     self.draw_steps_bfs(abierta)  # Dibujar la pantalla
+                    steps += 1
                     time.sleep(0.05)
 
         # Si hemos agotado la lista abierta, no hay camino
