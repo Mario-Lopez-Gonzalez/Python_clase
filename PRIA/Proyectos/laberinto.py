@@ -313,7 +313,11 @@ text = "Total de pasos: {} pasos".format(steps_bfs)
 cartel.draw(text,white)
 time.sleep(2)
 window.fill(black)
-laberinto.draw()
+text = "DFS: {}s BFS: {}s".format(tiempo_dfs,tiempo_bfs)
+cartel.draw(text,white)
+time.sleep(2)
+text = "DFS: {} pasos BFS: {}pasos".format(steps_dfs,steps_bfs)
+cartel.draw(text,white)
 # Refrescamos la pantalla
 pygame.display.update()
 
