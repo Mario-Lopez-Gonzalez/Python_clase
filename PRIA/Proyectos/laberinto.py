@@ -217,10 +217,10 @@ class Labyrinth:
             if (x, y) == self.salida:
                 # Reconstruir la ruta desde el final hasta el comienzo
                 camino = []
-                while (x, y) is not None:
-                    camino.append((x, y))
-                    x, y = padre[(x, y)] # TODO bug al llegar aquí
-                camino.reverse()  # Invertir para obtener la ruta desde el inicio hasta la salida
+                pos = (x, y)
+                while pos is not None:
+                    camino.append(pos)
+                    pos = padre[pos]
                 self.draw_bfs_path(camino)
                 return len(camino)
             
