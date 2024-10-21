@@ -236,6 +236,73 @@ class Labyrinth:
         # Esto no debería de ocurrir
         print("No se encontró una ruta")
         return None
+    
+    def a_star(self):
+        window.fill(black)
+        laberinto.draw()
+        pygame.display.update()
+        # Movimientos posibles: derecha, abajo, izquierda, arriba
+        movimientos = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        # Inicializar la lista abierta y cerrada
+        abierta = set()  # Celdas a explorar
+        cerrada = set()  # Celdas ya exploradas
+        # Diccionarios para almacenar la ruta y los costos
+        padres = {}
+        g_cost = {}  # Costo desde el inicio
+        f_cost = {}  # Costo total (g + h)
+
+        # Agregar el nodo inicial a la lista abierta
+        abierta.add(self.entrada)
+        g_cost[self.entrada] = 0
+        f_cost[self.entrada] = self.heuristica(self.entrada)
+
+        while abierta:
+            # Seleccionar el nodo con el costo f más bajo
+            nodo_actual = min(abierta, key=lambda x: f_cost.get(x, float('inf')))
+            # Verificar si hemos llegado a la meta
+            if nodo_actual == self.salida:
+                length = self.draw_a_path(padres, nodo_actual)
+                return length
+
+            # Mover el nodo actual de la lista abierta a la lista cerrada
+            abierta.remove(nodo_actual)
+            cerrada.add(nodo_actual)
+
+            # Intentar moverse en las cuatro direcciones
+            for dx, dy in movimientos:
+                nuevo_x, nuevo_y = nodo_actual[0] + dx, nodo_actual[1] + dy
+                nuevo_nodo = (nuevo_x, nuevo_y)
+
+                if self.es_camino(nuevo_x, nuevo_y) and nuevo_nodo not in cerrada:
+                    # Calcular costos g y f
+                    g_temp = g_cost[nodo_actual] + 1
+                    if nuevo_nodo not in abierta:
+                        abierta.add(nuevo_nodo)
+                    elif g_temp >= g_cost.get(nuevo_nodo, float('inf')):
+                        continue  # No se mejora la ruta
+
+                    # Actualizar los costos y el padre
+                    padres[nuevo_nodo] = nodo_actual
+                    g_cost[nuevo_nodo] = g_temp
+                    f_cost[nuevo_nodo] = g_temp + self.heuristica(nuevo_nodo)
+                    self.draw_steps_bfs(abierta)  # Dibujar la pantalla
+                    time.sleep(0.05)
+
+        # Si hemos agotado la lista abierta, no hay camino
+        return -1
+
+    def heuristica(self, nodo):
+        # Heurística simple: distancia de Manhattan
+        return abs(nodo[0] - self.salida[0]) + abs(nodo[1] - self.salida[1])
+
+    def draw_a_path(self, padres, nodo):
+        camino = []
+        while nodo in padres:
+            camino.append(nodo)
+            nodo = padres[nodo]
+        camino.reverse()  # Invertir el camino para que esté desde el inicio hasta el final
+        self.draw_bfs_path(camino) # Debería de funcionar con este
+        return len(camino)
 # Bloque principal
 
 # Invocamos laberinto
@@ -271,6 +338,8 @@ window.fill(black)
 laberinto.draw()
 pygame.display.update()
 time.sleep(1)
+
+# Bloque de DFS
 # Enseñamos texto
 cartel.draw("Método Depth-First Search (DFS)",white)
 time.sleep(1.5)
@@ -294,6 +363,8 @@ window.fill(black)
 laberinto.draw()
 pygame.display.flip() # Si el flip se hace en el método da un poco de epilepsia
 time.sleep(2)
+
+# Bloque de BFS
 cartel.draw("Método Breadth-First Search (BFS)",white)
 time.sleep(1.5)
 # Comenzamos a contar el tiempo de resolución
@@ -313,10 +384,36 @@ text = "Total de pasos: {} pasos".format(steps_bfs)
 cartel.draw(text,white)
 time.sleep(2)
 window.fill(black)
-text = "DFS: {}s BFS: {}s".format(tiempo_dfs,tiempo_bfs)
+laberinto.draw()
+pygame.display.flip()
+time.sleep(2)
+
+# Bloque de A*
+cartel.draw("Método A*",white)
+time.sleep(1.5)
+# Comenzamos a contar el tiempo de resolución
+inicio = time.perf_counter()
+# Resolvemos y guardamos los pasos
+steps_a = laberinto.a_star()
+# Dejamos de contar el tiempo de resolución
+fin = time.perf_counter()
+# Calculamos la diferencia de tiempos y formateamos para enseñarlo
+tiempo = fin - inicio
+tiempo_a = "{:.4f}".format(tiempo)
+text = "Tiempo total: {}s".format(tiempo_a)
+time.sleep(1)
 cartel.draw(text,white)
 time.sleep(2)
-text = "DFS: {} pasos BFS: {}pasos".format(steps_dfs,steps_bfs)
+text = "Total de pasos: {} pasos".format(steps_a)
+cartel.draw(text,white)
+time.sleep(2)
+
+# Comparativa
+window.fill(black)
+text = "DFS: {}s BFS: {}s A*: {}s".format(tiempo_dfs,tiempo_bfs,tiempo_a)
+cartel.draw(text,white)
+time.sleep(2)
+text = "DFS: {} pasos BFS: {} pasos A*: {} pasos".format(steps_dfs,steps_bfs,steps_a)
 cartel.draw(text,white)
 # Refrescamos la pantalla
 pygame.display.update()
