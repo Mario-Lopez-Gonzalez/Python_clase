@@ -340,6 +340,21 @@ window.fill(black)
 laberinto.draw()
 pygame.display.update()
 time.sleep(1)
+cartel.draw("Pulsa R para regenerar el laberinto e INTRO para empezar la demo",white)
+time.sleep(3)
+laberinto.draw()
+pygame.display.update()
+# Regeneramos laberinto si necesario
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                running = False
+            if event.key == pygame.K_r:
+                laberinto = Labyrinth(x,y)
+                laberinto.draw()
+                pygame.display.update()
 
 # Bloque de DFS
 # Enseñamos texto
