@@ -80,20 +80,18 @@ class Labyrinth:
         # Comenzar desde una celda inicial (1, 1)
         visitar(1, 1)
         
-        # Crear entrada en la parte superior (0, ?)
-        r = random.randint(1,self.columnas-2)
-        self.lab[0][r] = -1
+        # Crear entrada aleatoria
+        rx = random.randint(1,self.filas-2)
+        ry = random.randint(1,self.columnas-2)
+        self.lab[rx][ry] = -1
         # Creamos atributo con las coordenadas de entrada
-        self.entrada = (0,r)
-        # Evitamos que el de abajo esté cerrado
-        self.lab[1][r] = 0
-        # Crear salida en la parte inferior (filas-1, ?)
-        r = random.randint(1,self.columnas-2)
-        self.lab[self.filas-1][r] = -2
+        self.entrada = (rx,ry)
+        # Crear salida aleatoria
+        rx = random.randint(1,self.filas-2)
+        ry = random.randint(1,self.columnas-2)
+        self.lab[rx][ry] = -2
         # Creamos atributo con las coordenadas de salida
-        self.salida = (self.filas-1,r)
-        # Evitamos que el de encima esté cerrado
-        self.lab[self.filas-2][r] = 0
+        self.salida = (rx,ry)
 
     def draw(self):
         # Borramos todo
