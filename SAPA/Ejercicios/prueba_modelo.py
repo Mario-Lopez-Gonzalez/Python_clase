@@ -80,8 +80,47 @@ class EmbarkedTransformer(BaseEstimator, TransformerMixin):
 # Cargar el modelo de randomforest
 modelo = load('SAPA/Ejercicios/modelo_random_forest.joblib')
 
-# Cargar el csv
-df = pd.read_csv("SAPA/Ejercicios/datos/titanic_test_data.csv")
+# Crear el csv con datos reales y falsos y cargar
+
+import pandas as pd
+import seaborn as sns
+import numpy as np
+
+# definimos N
+N = 100
+
+# Cargar el conjunto de datos del Titanic
+titanic = sns.load_dataset('titanic')
+
+# Obtener 20 filas aleatorias
+random_sample = titanic.sample(n=N)
+
+# Renombrar la columna 'survived' a 'real_survived'
+random_sample = random_sample.rename(columns={'survived': 'real_survived'})
+
+# Crear un DataFrame con valores aleatorios
+new_random_data = pd.DataFrame({
+    'pclass': np.random.choice([1, 2, 3], size=N),  # Clase del pasajero
+    'sex': np.random.choice(['male', 'female'], size=N),  # Sexo
+    'age': np.random.randint(1, 80, size=N),  # Edad
+    'sibsp': np.random.randint(0, 5, size=N),  # Hermanos/esposos a bordo
+    'parch': np.random.randint(0, 5, size=N),  # Padres/hijos a bordo
+    'fare': np.random.uniform(0, 500, size=N),  # Tarifa pagada
+    'embarked': np.random.choice(['C', 'Q', 'S'], size=N),  # Puerto de embarque
+})
+
+# Establecer NaN en la columna 'real_survived'
+new_random_data['real_survived'] = np.nan
+
+# Combinar los dos DataFrames
+df = pd.concat([random_sample, new_random_data], ignore_index=True)
+
+# Guardar el DataFrame combinado en un archivo CSV
+df.to_csv('SAPA/Ejercicios/datos/titanic_random_sample.csv', index=False)
+
+# Cargamos csv y purgamos
+df = pd.read_csv('SAPA/Ejercicios/datos/titanic_random_sample.csv')
+df.drop(columns=["class","who","adult_male","deck","embark_town","alive","alone"], inplace=True)
 
 # Hacer predicciones
 predict = modelo.predict(df)
@@ -89,5 +128,26 @@ predict = modelo.predict(df)
 # Añadimos la prediccion
 df["survived"] = predict
 
+# Reordenar columnas
+columns_order = [col for col in df.columns if col not in ['real_survived', 'survived']] + ['real_survived', 'survived']
+df = df[columns_order]
+# Filas aleatorias
+df = df.sample(frac=1, random_state=1).reset_index(drop=True)
+
 # Imprimimos
 print(df)
+
+# Calcular el número total de coincidencias
+total_matches = (df['real_survived'] == df['survived']).sum()
+
+# Calcular el número total de filas que no tienen NaN en 'real_survived'
+total_valid = df['real_survived'].notna().sum()
+
+# Calcular el porcentaje de acierto
+if total_valid > 0:
+    accuracy_percentage = (total_matches / total_valid) * 100
+else:
+    accuracy_percentage = 0
+
+# Mostrar el porcentaje de acierto
+print(f"El porcentaje de acierto entre 'real_survived' y 'survived' es: {accuracy_percentage:.2f}%")
