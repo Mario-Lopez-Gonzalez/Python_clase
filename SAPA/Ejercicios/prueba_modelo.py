@@ -1,153 +1,89 @@
-from joblib import load
-import pandas as pd
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
+import pandas as pd
+import joblib
+import os
 from sklearn.impute import SimpleImputer
 
-# Si no importo todas las class custom peta
+# Funciones custom
 
-# Clase para codificar el sexo
-class SexEncoder(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        self.le = LabelEncoder()
-        self.le.fit(X.to_numpy().ravel())  # Necesario array 1D
-        return self
+# Funcion para los feature_names_out de age
+def age_name(function_transformer, feature_names_in):
+    return ["age"]  # feature names out
 
-    def transform(self, X):
-        return self.le.transform(X.values.ravel()).reshape(-1, 1)
-    
-    def get_feature_names_out(self, input_features=None):
-        return np.array(['sex_encoded'])  # Devuelve nombre columna
+# Funcion para los feature_names_out de age
+def family_name(function_transformer, feature_names_in):
+    return ["family"]  # feature names out
 
-# Clase para procesar la edad
-class AgeEncoder(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        self.imputer = SimpleImputer(strategy='most_frequent')  # Rellenar valores faltantes con la moda
-        self.imputer.fit(X)  # Ajustar el imputador
-        return self
+# Función para categorizar edades
+def categorize_age(X):
+    imputer = SimpleImputer(strategy='most_frequent',)
+    X_imputed = imputer.fit_transform(X)
+    return pd.cut(X_imputed.flatten(), bins=[-1, 16, 32, 48, 64, np.inf], labels=[1, 2, 3, 4, 5]).to_numpy().reshape(-1, 1)
 
-    def transform(self, X):
-        X_imputed = self.imputer.transform(X)
-        # Categorizamos las edades en grupos
-        age_bins = [0, 16, 32, 48, 64, np.inf]  # Definir los límites de los grupos
-        age_labels = [1, 2, 3, 4, 5]  # Etiquetas para los grupos
-        return pd.cut(X_imputed.flatten(), bins=age_bins, labels=age_labels).to_numpy().reshape(-1, 1)
-    
-    def get_feature_names_out(self, input_features=None):
-        return np.array(['age_encoded'])
+# Función para transformar tamaño de familia
+def transform_family(X):
+    return (X['sibsp'] + X['parch']).values.reshape(-1, 1)
 
-# Clase para crear la columna 'family'
-class FamilySizeTransformer(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        self.imputer = SimpleImputer(strategy='most_frequent')  # Rellenar valores faltantes con la moda
-        self.imputer.fit(X)  # Ajustar el imputador
-        return self
+# Función para cargar el CSV
+def load_csv():
+    while True:
+        file_path = input("Por favor, introduce la ruta del archivo CSV: ")
+        if os.path.isfile(file_path):
+            try:
+                df = pd.read_csv(file_path)
+                # Controlar que no contenga la columna 'Survived'
+                if 'survived' in df.columns:
+                    print("Error: El archivo no debe contener la columna 'survived'.")
+                else:
+                    return df
+            except Exception as e:
+                print(f"Error al cargar el archivo: {e}")
+        else:
+            print("Error: El archivo no existe. Inténtalo de nuevo.")
 
-    def transform(self, X):
-        return (X['sibsp'] + X['parch']).to_numpy().reshape(-1, 1)
+# Función para cargar el modelo
+def load_model(model_path):
+    if os.path.isfile(model_path):
+        try:
+            model = joblib.load(model_path)
+            return model
+        except Exception as e:
+            print(f"Error al cargar el modelo: {e}")
+            return None
+    else:
+        print("Error: El modelo no existe. Asegúrate de que la ruta sea correcta.")
+        return None
 
-    def get_feature_names_out(self, input_features=None):
-        return np.array(['family_transformed'])  # Nombre de la nueva columna
+# Función para realizar la predicción
+def make_prediction(model, df):
+    try:
+        predictions = model.predict(df)
+        return predictions
+    except Exception as e:
+        print(f"Error al realizar la predicción: {e}")
+        return None
 
-# Clase para procesar el puerto de embarque
-class EmbarkedTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        self.imputer = SimpleImputer(strategy='most_frequent')  # Rellenar valores faltantes con la moda
-        self.encoder = OneHotEncoder(sparse_output=False)  # Configuración para obtener un array denso
+def main():
+    # Cargar el DataFrame desde el CSV
+    df = load_csv()
 
-    def fit(self, X, y=None):
-        # Ajustar el imputador a los datos
-        self.imputer.fit(X)
-        # Ajustar el codificador a los datos imputados
-        X_imputed = self.imputer.transform(X)
-        self.encoder.fit(X_imputed)
-        return self
+    # Cargar el modelo
+    model_path = input("Por favor, introduce la ruta del archivo del modelo (.pkl): ")
+    model = load_model(model_path)
 
-    def transform(self, X):
-        # Rellenar valores faltantes primero
-        X_imputed = self.imputer.transform(X)
-        # Transformar los datos
-        transformed_data = self.encoder.transform(X_imputed)
-        # Obtener los nombres de las columnas codificadas
-        column_names = self.encoder.get_feature_names_out(input_features=X.columns)
-        return pd.DataFrame(transformed_data, columns=column_names, index=X.index)
+    # Si el modelo se carga correctamente, realizar la predicción
+    if model is not None:
+        predictions = make_prediction(model, df)
+        
+        if predictions is not None:
+            # Mostrar las predicciones
+            df['Predictions'] = predictions
+            print("Predicciones realizadas:")
+            print(df[['Predictions']])
+        else:
+            print("No se pudieron realizar predicciones.")
+    else:
+        print("No se pudo cargar el modelo.")
 
-    def get_feature_names_out(self, input_features=None):
-        return self.encoder.get_feature_names_out()  # Obtener los nombres de las columnas codificadas
-    
-
-# Cargar el modelo de randomforest
-modelo = load('SAPA/Ejercicios/modelo_random_forest.joblib')
-
-# Crear el csv con datos reales y falsos y cargar
-
-import pandas as pd
-import seaborn as sns
-import numpy as np
-
-# definimos N
-N = 100
-
-# Cargar el conjunto de datos del Titanic
-titanic = sns.load_dataset('titanic')
-
-# Obtener 20 filas aleatorias
-random_sample = titanic.sample(n=N)
-
-# Renombrar la columna 'survived' a 'real_survived'
-random_sample = random_sample.rename(columns={'survived': 'real_survived'})
-
-# Crear un DataFrame con valores aleatorios
-new_random_data = pd.DataFrame({
-    'pclass': np.random.choice([1, 2, 3], size=N),  # Clase del pasajero
-    'sex': np.random.choice(['male', 'female'], size=N),  # Sexo
-    'age': np.random.randint(1, 80, size=N),  # Edad
-    'sibsp': np.random.randint(0, 5, size=N),  # Hermanos/esposos a bordo
-    'parch': np.random.randint(0, 5, size=N),  # Padres/hijos a bordo
-    'fare': np.random.uniform(0, 500, size=N),  # Tarifa pagada
-    'embarked': np.random.choice(['C', 'Q', 'S'], size=N),  # Puerto de embarque
-})
-
-# Establecer NaN en la columna 'real_survived'
-new_random_data['real_survived'] = np.nan
-
-# Combinar los dos DataFrames
-df = pd.concat([random_sample, new_random_data], ignore_index=True)
-
-# Guardar el DataFrame combinado en un archivo CSV
-df.to_csv('SAPA/Ejercicios/datos/titanic_random_sample.csv', index=False)
-
-# Cargamos csv y purgamos
-df = pd.read_csv('SAPA/Ejercicios/datos/titanic_random_sample.csv')
-df.drop(columns=["class","who","adult_male","deck","embark_town","alive","alone"], inplace=True)
-
-# Hacer predicciones
-predict = modelo.predict(df)
-
-# Añadimos la prediccion
-df["survived"] = predict
-
-# Reordenar columnas
-columns_order = [col for col in df.columns if col not in ['real_survived', 'survived']] + ['real_survived', 'survived']
-df = df[columns_order]
-# Filas aleatorias
-df = df.sample(frac=1, random_state=1).reset_index(drop=True)
-
-# Imprimimos
-print(df)
-
-# Calcular el número total de coincidencias
-total_matches = (df['real_survived'] == df['survived']).sum()
-
-# Calcular el número total de filas que no tienen NaN en 'real_survived'
-total_valid = df['real_survived'].notna().sum()
-
-# Calcular el porcentaje de acierto
-if total_valid > 0:
-    accuracy_percentage = (total_matches / total_valid) * 100
-else:
-    accuracy_percentage = 0
-
-# Mostrar el porcentaje de acierto
-print(f"El porcentaje de acierto entre 'real_survived' y 'survived' es: {accuracy_percentage:.2f}%")
+if __name__ == "__main__":
+    main()
