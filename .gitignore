@@ -1,3 +1,4 @@
 PRIA/Archivos_txt*
 PRIA/__pycache__*
 SAPA/Ejercicios/datos/titanic_random_sample.csv
+.vscode/*
