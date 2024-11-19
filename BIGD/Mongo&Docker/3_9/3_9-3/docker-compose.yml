@@ -1,0 +1,130 @@
+services:
+
+
+## Router
+  router1:
+    image: mongo
+    container_name: router1
+    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017 --bind_ip_all
+    ports:
+      - 27117:27017
+    restart: always
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_router1_db:/data/db
+      - mongodb_cluster_router1_config:/data/configdb
+    networks:
+      - mongo-network-sharded
+
+
+## Config Servers
+  configsvr1:
+    image: mongo
+    container_name: configsvr1
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_configsvr1_db:/data/db
+      - mongodb_cluster_configsvr1_config:/data/configdb
+    ports:
+      - 27118:27017
+    restart: always
+    links:
+      - shard1a
+      - shard1b
+      - shard2a
+      - shard2b
+    networks:
+      - mongo-network-sharded
+
+
+## Shards
+  ## Shards shard1
+  shard1a:
+    image: mongo
+    container_name: shard1a
+    command: mongod --port 27017 --shardsvr --replSet rshard1 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_shard1a_a_db:/data/db
+      - mongodb_cluster_shard1a_a_config:/data/configdb
+    ports:
+      - 27119:27017
+    restart: always
+    networks:
+      - mongo-network-sharded
+
+
+  shard1b:
+    image: mongo
+    container_name: shard1b
+    command: mongod --port 27017 --shardsvr --replSet rshard1 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_shard1b_a_db:/data/db
+      - mongodb_cluster_shard1b_a_config:/data/configdb
+    ports:
+      - 27120:27017
+    restart: always
+    networks:
+      - mongo-network-sharded
+
+
+  ## Shards shard2
+  shard2a:
+    image: mongo
+    container_name: shard2a
+    command: mongod --port 27017 --shardsvr --replSet rshard2 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_shard2a_a_db:/data/db
+      - mongodb_cluster_shard2a_a_config:/data/configdb
+    ports:
+      - 27121:27017
+    restart: always
+    networks:
+      - mongo-network-sharded
+
+
+  shard2b:
+    image: mongo
+    container_name: shard2b
+    command: mongod --port 27017 --shardsvr --replSet rshard2 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_shard2b_a_db:/data/db
+      - mongodb_cluster_shard2b_a_config:/data/configdb
+    ports:
+      - 27122:27017
+    restart: always
+    networks:
+      - mongo-network-sharded
+
+volumes:
+  mongodb_cluster_router1_db:
+  mongodb_cluster_router1_config:
+
+
+  mongodb_cluster_configsvr1_db:
+  mongodb_cluster_configsvr1_config:
+
+
+  mongodb_cluster_shard1a_a_db:
+  mongodb_cluster_shard1a_a_config:
+
+
+  mongodb_cluster_shard1b_a_db:
+  mongodb_cluster_shard1b_a_config:
+
+
+  mongodb_cluster_shard2a_a_db:
+  mongodb_cluster_shard2a_a_config:
+
+
+  mongodb_cluster_shard2b_a_db:
+  mongodb_cluster_shard2b_a_config:
+
+
+networks:
+  mongo-network-sharded:
+    driver: bridge
