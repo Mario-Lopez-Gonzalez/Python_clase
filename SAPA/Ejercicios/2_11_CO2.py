@@ -3,10 +3,32 @@ import pandas as pd
 
 def obtener_datos_usuario():
     # Pedir al usuario los datos de entrada
-    car = input("Introduce tu marca de coche: ")
-    model = input("Introduce tu modelo de coche: ")
-    volume = input("Introduce el volumen de tu coche: ")
-    weight = input("Introduce el peso de tu coche: ")
+    ok = False
+    while ok == False:
+        try:
+            car = input("Introduce tu marca de coche: ").strip()
+            if not car:
+                raise ValueError("La marca del coche no puede estar vacía.")
+            
+            model = input("Introduce tu modelo de coche: ").strip()
+            if not model:
+                raise ValueError("El modelo del coche no puede estar vacío.")
+            
+            volume = input("Introduce el volumen de tu coche (en litros): ").strip()
+            volume = int(volume)  # Convertir a número, lanza ValueError si no es válido
+            if volume <= 0:
+                raise ValueError("El volumen debe ser un número entero positivo.")
+            
+            weight = input("Introduce el peso de tu coche (en kilogramos): ").strip()
+            weight = int(weight)  # Convertir a número, lanza ValueError si no es válido
+            if weight <= 0:
+                raise ValueError("El peso debe ser un número entero positivo.")
+            
+            # Si todo es válido, salir del bucle
+            ok = True
+        
+        except ValueError as e:
+            print(f"Error: {e}. Por favor, inténtalo de nuevo.")
     
     # Regresar los datos como un diccionario
     return {
@@ -32,7 +54,7 @@ def predecir(modelo, datos_usuario):
 
 def main():
     # Ruta del modelo preentrenado
-    modelo_path = 'F:\Documents\Python_Clase\Python_clase\SAPA\Ejercicios\modelo2_11CO2.pkl'  #NOTE Ruta al archivo del modelo
+    modelo_path = '/home/iabd/Documentos/Python_clase/SAPA/Ejercicios/modelo2_11CO2.pkl'  #NOTE Ruta al archivo del modelo
     
     # Cargar el modelo preentrenado
     modelo = cargar_modelo(modelo_path)
