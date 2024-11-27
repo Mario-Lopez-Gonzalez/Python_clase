@@ -31,20 +31,24 @@ def predecir(modelo, datos_usuario):
     return prediccion
 
 def main():
-    # Ruta del modelo preentrenado
-    modelo_path = 'F:\Documents\Python_Clase\Python_clase\SAPA\Ejercicios\modelo2_11CO2.pkl'  #NOTE Ruta al archivo del modelo
+    try:
+        # Ruta del modelo preentrenado
+        modelo_path = '.\SAPA\Ejercicios\modelo2_11CO2.pkl'  #NOTE Ruta al archivo del modelo
+        
+        # Cargar el modelo preentrenado
+        modelo = cargar_modelo(modelo_path)
+        
+        # Obtener los datos del usuario
+        datos_usuario = obtener_datos_usuario()
+        
+        # Realizar la predicción
+        resultado = predecir(modelo, datos_usuario)
+        
+        # Mostrar el resultado de la predicción
+        print(f"La predicción para los datos proporcionados es: {resultado[0]}")
     
-    # Cargar el modelo preentrenado
-    modelo = cargar_modelo(modelo_path)
-    
-    # Obtener los datos del usuario
-    datos_usuario = obtener_datos_usuario()
-    
-    # Realizar la predicción
-    resultado = predecir(modelo, datos_usuario)
-    
-    # Mostrar el resultado de la predicción
-    print(f"La predicción para los datos proporcionados es: {resultado[0]}")
-    
+    except Exception as e:
+        print("Algo salió mal. Por favor, intente nuevamente.")
+
 if __name__ == '__main__':
     main()
