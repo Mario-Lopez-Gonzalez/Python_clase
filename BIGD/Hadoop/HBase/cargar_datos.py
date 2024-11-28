@@ -2,11 +2,12 @@ import csv
 import happybase
 
 # Conectar a HBase
-connection = happybase.Connection('ec2-34-239-164-183.compute-1.amazonaws.com')
+connection = happybase.Connection('ec2-44-200-191-121.compute-1.amazonaws.com', timeout=5000)
+print(connection.tables())
 table = connection.table('tickets')
 
 # Leer el CSV y cargar los datos
-with open('BIGD\Hadoop\HBase\datos\tech_support_dataset.csv', 'r') as csvfile:
+with open('/home/iabd/Documentos/Python_clase/BIGD/Hadoop/HBase/datos/tech_support_dataset.csv', 'r') as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
         row_key = row['Conversation_ID']  # Usa una columna como clave de fila
