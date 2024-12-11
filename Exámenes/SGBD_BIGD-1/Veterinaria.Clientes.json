@@ -1,0 +1,27 @@
+[{
+  "_id": {
+    "$oid": "6759d08e81b86d153f3d2cf0"
+  },
+  "id": 1,
+  "nombre": "Ana",
+  "apellido": "Alto",
+  "telefono": "111111111"
+},
+{
+  "_id": {
+    "$oid": "6759d09a81b86d153f3d2cf2"
+  },
+  "id": 2,
+  "nombre": "Belen",
+  "apellido": "Bajo",
+  "telefono": "222222222"
+},
+{
+  "_id": {
+    "$oid": "6759d0a381b86d153f3d2cf4"
+  },
+  "id": 3,
+  "nombre": "Carlos",
+  "apellido": "Cuadrado",
+  "telefono": "333333333"
+}]

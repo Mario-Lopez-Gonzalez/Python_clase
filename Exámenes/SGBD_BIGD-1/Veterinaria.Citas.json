@@ -1,0 +1,18 @@
+[{
+  "_id": {
+    "$oid": "6759d06481b86d153f3d2cea"
+  },
+  "id": 1,
+  "fecha": "12/12/2024",
+  "motivo": "Se le ha roto el ala",
+  "idMascota": 1
+},
+{
+  "_id": {
+    "$oid": "6759d06481b86d153f3d2ceb"
+  },
+  "id": 2,
+  "fecha": "02/02/2025",
+  "motivo": "Se ha tragado un tornillo",
+  "idMascota": 2
+}]

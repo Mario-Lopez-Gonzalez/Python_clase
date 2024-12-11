@@ -1,0 +1,30 @@
+[{
+  "_id": {
+    "$oid": "6759cef09d84e8c06498e90b"
+  },
+  "id": 1,
+  "nombre": "Artz",
+  "especie": "Agaporni",
+  "raza": "Amarillo",
+  "idCliente": 1
+},
+{
+  "_id": {
+    "$oid": "6759cef09d84e8c06498e90c"
+  },
+  "id": 2,
+  "nombre": "Bat",
+  "especie": "Perro",
+  "raza": "Bichón Maltés",
+  "idCliente": 2
+},
+{
+  "_id": {
+    "$oid": "6759cfdd81b86d153f3d2ce8"
+  },
+  "id": 3,
+  "nombre": "Cres",
+  "especie": "Gato",
+  "raza": "Atigrado",
+  "idCliente": 2
+}]
