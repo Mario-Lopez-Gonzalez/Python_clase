@@ -5,3 +5,5 @@ SAPA/Ejercicios/datos/titanic_random_sample.csv
 SAPA/Ejercicios/tensorflow_datasets/*
 SAPA/Ejercicios/datos/Standford-dogs/*
 SAPA/Ejercicios/Resultados/*
+*.mp4
+*.pt
