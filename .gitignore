@@ -8,3 +8,5 @@ SAPA/Ejercicios/Resultados/*
 *.mp4
 *.pt
 sam2/*
+BIGD/Spark/Datos/stocks_price_final.csv
+BIGD/Spark/Datos/movies.tsv
