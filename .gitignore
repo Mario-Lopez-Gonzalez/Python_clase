@@ -11,3 +11,5 @@ sam2/*
 BIGD/Spark/Datos/stocks_price_final.csv
 BIGD/Spark/Datos/movies.tsv
 BIGD/Spark/Datos/salesdata/*
+SAPA/Ejercicios/tokenizers/*
+SAPA/Ejercicios/modelos/*
